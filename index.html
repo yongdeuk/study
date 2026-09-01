@@ -73,10 +73,10 @@
 
   .page {
     height: 100%;
-    padding: 5.2vh 4.4vw;
+    padding: 5.2rem 4.4vw;
     display: flex;
     flex-direction: column;
-    gap: 3.2vh;
+    gap: 3.2rem;
   }
 
   header {
@@ -91,14 +91,14 @@
   .title-block {
     display: flex;
     flex-direction: column;
-    gap: 0.9vh;
+    gap: 0.9rem;
     min-width: 0;
   }
 
   h1 {
     font-family: "Gowun Dodum", "Noto Sans KR", sans-serif;
     font-weight: 400;
-    font-size: 9.8vh;
+    font-size: 9.8rem;
     line-height: 1.2;
     margin: 0;
     text-wrap: balance;
@@ -109,21 +109,21 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 0.3vh;
+    gap: 0.3rem;
     flex: none;
     text-align: right;
   }
 
   .clock {
     font-variant-numeric: tabular-nums;
-    font-size: 7vh;
+    font-size: 7rem;
     font-weight: 600;
     color: var(--ink);
   }
 
   .phase {
     font-variant-numeric: tabular-nums;
-    font-size: 3.2vh;
+    font-size: 3.2rem;
     color: var(--ink-faint);
     white-space: nowrap;
   }
@@ -136,6 +136,7 @@
     min-height: 0;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    align-items: start;
     gap: 2vw;
   }
 
@@ -143,10 +144,10 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-top: 3px solid var(--line);
-    padding: 2.6vh 1.8vw;
+    padding: 2.6rem 1.8vw;
     display: flex;
     flex-direction: column;
-    gap: 1.8vh;
+    gap: 1.8rem;
     min-height: 0;
   }
 
@@ -163,16 +164,16 @@
   }
 
   .icon {
-    width: 5.1vh;
-    height: 5.1vh;
+    width: 5.1rem;
+    height: 5.1rem;
     flex: none;
     display: block;
     color: var(--line);
   }
   .icon svg {
     display: block;
-    width: 5.1vh;
-    height: 5.1vh;
+    width: 5.1rem;
+    height: 5.1rem;
     stroke: currentColor;
     fill: none;
     stroke-width: 1.6;
@@ -182,7 +183,7 @@
 
   .card h2 {
     font-family: "Gowun Dodum", "Noto Sans KR", sans-serif;
-    font-size: 3.9vh;
+    font-size: 3.9rem;
     font-weight: 400;
     margin: 0;
     color: var(--ink);
@@ -194,7 +195,7 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 1.9vh;
+    gap: 1.9rem;
     overflow: hidden;
   }
 
@@ -202,7 +203,7 @@
     display: flex;
     gap: 0.7vw;
     align-items: flex-start;
-    font-size: 3.1vh;
+    font-size: 3.1rem;
     line-height: 1.42;
     color: var(--ink);
   }
@@ -210,8 +211,8 @@
   .tips li::before {
     content: "";
     flex: none;
-    width: 0.5vh;
-    height: 0.5vh;
+    width: 0.5rem;
+    height: 0.5rem;
     margin-top: 0.7em;
     background: var(--ink-faint);
   }
@@ -220,10 +221,10 @@
     display: flex;
     align-items: center;
     flex: none;
-    padding-top: 2vh;
+    padding-top: 2rem;
     border-top: 1px solid var(--border);
     color: var(--ink-faint);
-    font-size: 2.9vh;
+    font-size: 2.9rem;
   }
 </style>
 
@@ -302,6 +303,19 @@
 </div>
 
 <script>
+  function fitScreen() {
+    var h = window.innerHeight;
+    var w = window.innerWidth;
+    document.documentElement.style.fontSize = (h / 100) + "px";
+    var board = document.querySelector(".board");
+    board.style.height = h + "px";
+    board.style.width = w + "px";
+  }
+
+  fitScreen();
+  window.addEventListener("resize", fitScreen);
+  window.addEventListener("orientationchange", fitScreen);
+
   function toSeconds(hhmm) {
     var parts = hhmm.split(":");
     return (+parts[0]) * 3600 + (+parts[1]) * 60;
