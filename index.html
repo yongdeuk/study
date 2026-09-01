@@ -57,6 +57,12 @@
     height: 100%;
   }
 
+  :root {
+    /* board's own box, letterboxed to 16:9 on any screen shape */
+    --bw: min(100vw, 177.78vh);
+    --bh: min(100vh, 56.25vw);
+  }
+
   body {
     margin: 0;
     background: var(--frame);
@@ -67,23 +73,19 @@
     justify-content: center;
   }
 
-  /* fixed 16:9 stage, letterboxed on any screen shape */
   .board {
     background: var(--bg);
-    width: min(100vw, 177.78vh);
-    height: min(100vh, 56.25vw);
-    aspect-ratio: 16 / 9;
-    container-type: size;
-    container-name: board;
+    width: var(--bw);
+    height: var(--bh);
     overflow: hidden;
   }
 
   .page {
     height: 100%;
-    padding: 5.2cqh 4.4cqw;
+    padding: calc(var(--bh) * 0.052) calc(var(--bw) * 0.044);
     display: flex;
     flex-direction: column;
-    gap: 3.2cqh;
+    gap: calc(var(--bh) * 0.032);
   }
 
   header {
@@ -91,21 +93,21 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 2cqw;
+    gap: calc(var(--bw) * 0.02);
     flex: none;
   }
 
   .title-block {
     display: flex;
     flex-direction: column;
-    gap: 0.9cqh;
+    gap: calc(var(--bh) * 0.009);
     min-width: 0;
   }
 
   h1 {
     font-family: "Gowun Dodum", "Noto Sans KR", sans-serif;
     font-weight: 400;
-    font-size: 9.8cqh;
+    font-size: calc(var(--bh) * 0.098);
     line-height: 1.2;
     margin: 0;
     text-wrap: balance;
@@ -116,21 +118,21 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 0.3cqh;
+    gap: calc(var(--bh) * 0.003);
     flex: none;
     text-align: right;
   }
 
   .clock {
     font-variant-numeric: tabular-nums;
-    font-size: 7cqh;
+    font-size: calc(var(--bh) * 0.07);
     font-weight: 600;
     color: var(--ink);
   }
 
   .phase {
     font-variant-numeric: tabular-nums;
-    font-size: 3.2cqh;
+    font-size: calc(var(--bh) * 0.032);
     color: var(--ink-faint);
     white-space: nowrap;
   }
@@ -143,17 +145,17 @@
     min-height: 0;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 2cqw;
+    gap: calc(var(--bw) * 0.02);
   }
 
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-top: 3px solid var(--line);
-    padding: 2.6cqh 1.8cqw;
+    padding: calc(var(--bh) * 0.026) calc(var(--bw) * 0.018);
     display: flex;
     flex-direction: column;
-    gap: 1.8cqh;
+    gap: calc(var(--bh) * 0.018);
     min-height: 0;
   }
 
@@ -165,13 +167,13 @@
   .card-head {
     display: flex;
     align-items: center;
-    gap: 0.9cqw;
+    gap: calc(var(--bw) * 0.009);
     flex: none;
   }
 
   .icon {
-    width: 5.1cqh;
-    height: 5.1cqh;
+    width: calc(var(--bh) * 0.051);
+    height: calc(var(--bh) * 0.051);
     flex: none;
     display: grid;
     place-items: center;
@@ -189,7 +191,7 @@
 
   .card h2 {
     font-family: "Gowun Dodum", "Noto Sans KR", sans-serif;
-    font-size: 3.9cqh;
+    font-size: calc(var(--bh) * 0.039);
     font-weight: 400;
     margin: 0;
     color: var(--ink);
@@ -201,15 +203,15 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 1.9cqh;
+    gap: calc(var(--bh) * 0.019);
     overflow: hidden;
   }
 
   .tips li {
     display: flex;
-    gap: 0.7cqw;
+    gap: calc(var(--bw) * 0.007);
     align-items: flex-start;
-    font-size: 3.1cqh;
+    font-size: calc(var(--bh) * 0.031);
     line-height: 1.42;
     color: var(--ink);
   }
@@ -217,8 +219,8 @@
   .tips li::before {
     content: "";
     flex: none;
-    width: 0.5cqh;
-    height: 0.5cqh;
+    width: calc(var(--bh) * 0.005);
+    height: calc(var(--bh) * 0.005);
     margin-top: 0.7em;
     background: var(--ink-faint);
   }
@@ -227,10 +229,10 @@
     display: flex;
     align-items: center;
     flex: none;
-    padding-top: 2cqh;
+    padding-top: calc(var(--bh) * 0.02);
     border-top: 1px solid var(--border);
     color: var(--ink-faint);
-    font-size: 2.9cqh;
+    font-size: calc(var(--bh) * 0.029);
   }
 </style>
 
