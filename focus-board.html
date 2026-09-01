@@ -1,0 +1,367 @@
+<title>몰입 보드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --frame: #e7e2d4;
+    --bg: #f5f1e8;
+    --surface: #faf7f0;
+    --ink: #2b2e33;
+    --ink-soft: #656a6f;
+    --ink-faint: #93979c;
+    --border: #ddd7c7;
+
+    --line-study: #57628a;
+    --line-health: #5c7f63;
+    --line-mind: #a97c42;
+    --line-digital: #9c5f52;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --frame: #0c0d10;
+      --bg: #16181c;
+      --surface: #1b1d22;
+      --ink: #e6e3da;
+      --ink-soft: #9c9fa4;
+      --ink-faint: #6c6f74;
+      --border: #2a2c31;
+
+      --line-study: #8993bd;
+      --line-health: #86a98c;
+      --line-mind: #c79c62;
+      --line-digital: #bd8579;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --frame: #0c0d10;
+    --bg: #16181c;
+    --surface: #1b1d22;
+    --ink: #e6e3da;
+    --ink-soft: #9c9fa4;
+    --ink-faint: #6c6f74;
+    --border: #2a2c31;
+
+    --line-study: #8993bd;
+    --line-health: #86a98c;
+    --line-mind: #c79c62;
+    --line-digital: #bd8579;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--frame);
+    color: var(--ink);
+    font-family: "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* fixed 16:9 stage, letterboxed on any screen shape */
+  .board {
+    background: var(--bg);
+    width: min(100vw, 177.78vh);
+    height: min(100vh, 56.25vw);
+    aspect-ratio: 16 / 9;
+    container-type: size;
+    container-name: board;
+    overflow: hidden;
+  }
+
+  .page {
+    height: 100%;
+    padding: 5.2cqh 4.4cqw;
+    display: flex;
+    flex-direction: column;
+    gap: 3.2cqh;
+  }
+
+  header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2cqw;
+    flex: none;
+  }
+
+  .title-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9cqh;
+    min-width: 0;
+  }
+
+  h1 {
+    font-family: "Gowun Dodum", "Noto Sans KR", sans-serif;
+    font-weight: 400;
+    font-size: 9.8cqh;
+    line-height: 1.2;
+    margin: 0;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+
+  .status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3cqh;
+    flex: none;
+    text-align: right;
+  }
+
+  .clock {
+    font-variant-numeric: tabular-nums;
+    font-size: 7cqh;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .phase {
+    font-variant-numeric: tabular-nums;
+    font-size: 3.2cqh;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+
+  .phase.study { color: var(--line-study); }
+  .phase.break { color: var(--line-mind); }
+
+  main {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2cqw;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--line);
+    padding: 2.6cqh 1.8cqw;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8cqh;
+    min-height: 0;
+  }
+
+  .card.study   { --line: var(--line-study); }
+  .card.health  { --line: var(--line-health); }
+  .card.mind    { --line: var(--line-mind); }
+  .card.digital { --line: var(--line-digital); }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 0.9cqw;
+    flex: none;
+  }
+
+  .icon {
+    width: 5.1cqh;
+    height: 5.1cqh;
+    flex: none;
+    display: grid;
+    place-items: center;
+    color: var(--line);
+  }
+  .icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .card h2 {
+    font-family: "Gowun Dodum", "Noto Sans KR", sans-serif;
+    font-size: 3.9cqh;
+    font-weight: 400;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .tips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.9cqh;
+    overflow: hidden;
+  }
+
+  .tips li {
+    display: flex;
+    gap: 0.7cqw;
+    align-items: flex-start;
+    font-size: 3.1cqh;
+    line-height: 1.42;
+    color: var(--ink);
+  }
+
+  .tips li::before {
+    content: "";
+    flex: none;
+    width: 0.5cqh;
+    height: 0.5cqh;
+    margin-top: 0.7em;
+    background: var(--ink-faint);
+  }
+
+  footer {
+    display: flex;
+    align-items: center;
+    flex: none;
+    padding-top: 2cqh;
+    border-top: 1px solid var(--border);
+    color: var(--ink-faint);
+    font-size: 2.9cqh;
+  }
+</style>
+
+<div class="board">
+  <div class="page">
+    <header>
+      <div class="title-block">
+        <h1>지금은, 몰입의 시간 🔥</h1>
+      </div>
+      <div class="status">
+        <span class="clock" id="clock">--:--</span>
+        <span class="phase" id="phase">시간 확인 중</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="card study">
+        <div class="card-head">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H12v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H12v16h6.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg>
+          </span>
+          <h2>공부 전략 ✍️</h2>
+        </div>
+        <ul class="tips">
+          <li>25분 집중 + 5분 휴식, 뽀모도로 🍅 (이름값 하는 타이머)</li>
+          <li>어려운 과목은 집중력 좋은 처음 40분에 먼저 배치하기</li>
+          <li>틀린 문제는 오답노트에 "왜 틀렸는지" 한 줄로 적기</li>
+        </ul>
+      </section>
+
+      <section class="card health">
+        <div class="card-head">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.35-9.5-9C1 7.5 2.8 4.5 6 4.5c2 0 3.4 1.2 4 2.3.6-1.1 2-2.3 4-2.3 3.2 0 5 3 3.5 6.5C19 15.65 12 20 12 20z"/></svg>
+          </span>
+          <h2>건강 관리 🧘</h2>
+        </div>
+        <ul class="tips">
+          <li>50분마다 일어나 20초 스트레칭 🐈 (고양이 자세 추천)</li>
+          <li>눈과 책·화면 사이 30cm, 코 박고 읽지 않기</li>
+          <li>물은 원샷 말고 한 모금씩 자주</li>
+        </ul>
+      </section>
+
+      <section class="card mind">
+        <div class="card-head">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3v2.2M12 18.8V21M4.2 12H2M22 12h-2.2M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6"/><circle cx="12" cy="12" r="4.6"/></svg>
+          </span>
+          <h2>마인드셋 💭</h2>
+        </div>
+        <ul class="tips">
+          <li>완벽하지 않아도 괜찮다, 오늘 분량만 채우기</li>
+          <li>옆 사람이 아니라 어제의 나와 비교하기</li>
+          <li>지금 이 몰입이 쌓여서 내일의 등급이 된다 (아마도) ✨</li>
+        </ul>
+      </section>
+
+      <section class="card digital">
+        <div class="card-head">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M4 4l16 16"/></svg>
+          </span>
+          <h2>디지털 습관 📵</h2>
+        </div>
+        <ul class="tips">
+          <li>휴대폰은 가방 속, 무음 모드 ✈️ (비행기 모드도 환영)</li>
+          <li>확인은 쉬는 시간에 몰아서 딱 한 번만</li>
+          <li>검색이 필요하면 손 들기 — 폰은 죄가 없지만 지금은 안 됨</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>조용한 집중은 서로에 대한 가장 큰 배려입니다 — 옆 사람 다리 떨기는 열정으로 쳐드릴게요 😉</footer>
+  </div>
+</div>
+
+<script>
+  function toSeconds(hhmm) {
+    var parts = hhmm.split(":");
+    return (+parts[0]) * 3600 + (+parts[1]) * 60;
+  }
+
+  var schedule = [
+    ["08:40", "09:30", "study"],
+    ["09:30", "09:40", "break"],
+    ["09:40", "10:30", "study"],
+    ["10:30", "10:40", "break"],
+    ["10:40", "11:30", "study"],
+    ["11:30", "11:40", "break"],
+    ["11:40", "12:30", "study"],
+    ["13:30", "14:20", "study"],
+    ["14:20", "14:30", "break"],
+    ["14:30", "15:20", "study"],
+    ["15:20", "15:30", "break"],
+    ["15:30", "16:20", "study"]
+  ].map(function (row) {
+    return { start: toSeconds(row[0]), end: toSeconds(row[1]), type: row[2] };
+  });
+
+  function pad(n) {
+    return String(n).padStart(2, "0");
+  }
+
+  function render() {
+    var now = new Date();
+    var nowSec = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+
+    var clockEl = document.getElementById("clock");
+    var phaseEl = document.getElementById("phase");
+
+    clockEl.textContent = pad(now.getHours()) + ":" + pad(now.getMinutes());
+
+    var current = schedule.find(function (p) { return nowSec >= p.start && nowSec < p.end; });
+
+    phaseEl.classList.remove("study", "break");
+
+    if (!current) {
+      phaseEl.textContent = "자습 시간이 아닙니다";
+      return;
+    }
+
+    var remaining = current.end - nowSec;
+    var mm = Math.floor(remaining / 60);
+    var ss = remaining % 60;
+    var label = current.type === "break" ? "쉬는 시간" : "자습 시간";
+
+    phaseEl.classList.add(current.type);
+    phaseEl.textContent = label + " · 종료까지 " + pad(mm) + ":" + pad(ss);
+  }
+
+  render();
+  setInterval(render, 1000);
+</script>
