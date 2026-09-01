@@ -57,35 +57,26 @@
     height: 100%;
   }
 
-  :root {
-    /* board's own box, letterboxed to 16:9 on any screen shape */
-    --bw: min(100vw, 177.78vh);
-    --bh: min(100vh, 56.25vw);
-  }
-
   body {
     margin: 0;
-    background: var(--frame);
+    background: var(--bg);
     color: var(--ink);
     font-family: "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .board {
+    width: 100vw;
+    height: 100vh;
     background: var(--bg);
-    width: var(--bw);
-    height: var(--bh);
     overflow: hidden;
   }
 
   .page {
     height: 100%;
-    padding: calc(var(--bh) * 0.052) calc(var(--bw) * 0.044);
+    padding: 5.2vh 4.4vw;
     display: flex;
     flex-direction: column;
-    gap: calc(var(--bh) * 0.032);
+    gap: 3.2vh;
   }
 
   header {
@@ -93,21 +84,21 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: calc(var(--bw) * 0.02);
+    gap: 2vw;
     flex: none;
   }
 
   .title-block {
     display: flex;
     flex-direction: column;
-    gap: calc(var(--bh) * 0.009);
+    gap: 0.9vh;
     min-width: 0;
   }
 
   h1 {
     font-family: "Gowun Dodum", "Noto Sans KR", sans-serif;
     font-weight: 400;
-    font-size: calc(var(--bh) * 0.098);
+    font-size: 9.8vh;
     line-height: 1.2;
     margin: 0;
     text-wrap: balance;
@@ -118,21 +109,21 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: calc(var(--bh) * 0.003);
+    gap: 0.3vh;
     flex: none;
     text-align: right;
   }
 
   .clock {
     font-variant-numeric: tabular-nums;
-    font-size: calc(var(--bh) * 0.07);
+    font-size: 7vh;
     font-weight: 600;
     color: var(--ink);
   }
 
   .phase {
     font-variant-numeric: tabular-nums;
-    font-size: calc(var(--bh) * 0.032);
+    font-size: 3.2vh;
     color: var(--ink-faint);
     white-space: nowrap;
   }
@@ -145,17 +136,17 @@
     min-height: 0;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: calc(var(--bw) * 0.02);
+    gap: 2vw;
   }
 
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-top: 3px solid var(--line);
-    padding: calc(var(--bh) * 0.026) calc(var(--bw) * 0.018);
+    padding: 2.6vh 1.8vw;
     display: flex;
     flex-direction: column;
-    gap: calc(var(--bh) * 0.018);
+    gap: 1.8vh;
     min-height: 0;
   }
 
@@ -167,21 +158,21 @@
   .card-head {
     display: flex;
     align-items: center;
-    gap: calc(var(--bw) * 0.009);
+    gap: 0.9vw;
     flex: none;
   }
 
   .icon {
-    width: calc(var(--bh) * 0.051);
-    height: calc(var(--bh) * 0.051);
+    width: 5.1vh;
+    height: 5.1vh;
     flex: none;
-    display: grid;
-    place-items: center;
+    display: block;
     color: var(--line);
   }
   .icon svg {
-    width: 100%;
-    height: 100%;
+    display: block;
+    width: 5.1vh;
+    height: 5.1vh;
     stroke: currentColor;
     fill: none;
     stroke-width: 1.6;
@@ -191,7 +182,7 @@
 
   .card h2 {
     font-family: "Gowun Dodum", "Noto Sans KR", sans-serif;
-    font-size: calc(var(--bh) * 0.039);
+    font-size: 3.9vh;
     font-weight: 400;
     margin: 0;
     color: var(--ink);
@@ -203,15 +194,15 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: calc(var(--bh) * 0.019);
+    gap: 1.9vh;
     overflow: hidden;
   }
 
   .tips li {
     display: flex;
-    gap: calc(var(--bw) * 0.007);
+    gap: 0.7vw;
     align-items: flex-start;
-    font-size: calc(var(--bh) * 0.031);
+    font-size: 3.1vh;
     line-height: 1.42;
     color: var(--ink);
   }
@@ -219,8 +210,8 @@
   .tips li::before {
     content: "";
     flex: none;
-    width: calc(var(--bh) * 0.005);
-    height: calc(var(--bh) * 0.005);
+    width: 0.5vh;
+    height: 0.5vh;
     margin-top: 0.7em;
     background: var(--ink-faint);
   }
@@ -229,10 +220,10 @@
     display: flex;
     align-items: center;
     flex: none;
-    padding-top: calc(var(--bh) * 0.02);
+    padding-top: 2vh;
     border-top: 1px solid var(--border);
     color: var(--ink-faint);
-    font-size: calc(var(--bh) * 0.029);
+    font-size: 2.9vh;
   }
 </style>
 
