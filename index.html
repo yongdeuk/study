@@ -283,11 +283,35 @@
   footer {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     flex: none;
     padding-top: 2rem;
     border-top: 1px solid var(--border);
     color: var(--ink-faint);
     font-size: 3.8rem;
+  }
+
+  #footer-next {
+    flex: none;
+    width: 3.6rem;
+    height: 3.6rem;
+    margin-left: 1.6vw;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--ink-soft);
+    font-size: 1.9rem;
+    line-height: 1;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  #footer-next:active {
+    background: var(--bg);
   }
 </style>
 
@@ -374,7 +398,10 @@
       </div>
     </div>
 
-    <footer id="footer">조용한 집중은 서로에 대한 가장 큰 배려입니다 — 옆 사람 다리 떨기는 열정으로 쳐드릴게요 😉</footer>
+    <footer id="footer">
+      <span id="footer-text">조용한 집중은 서로에 대한 가장 큰 배려입니다 — 옆 사람 다리 떨기는 열정으로 쳐드릴게요 😉</span>
+      <button type="button" id="footer-next" aria-label="다음 문구">→</button>
+    </footer>
   </div>
 </div>
 
@@ -834,15 +861,34 @@
     "내일 또 만나요, 오늘도 정말 수고했습니다"
   ];
 
-  function updateFooter() {
-    var footerEl = document.getElementById("footer");
-    var bucket = Math.floor(Date.now() / 300000);
-    var i = ((bucket % FOOTER_LINES.length) + FOOTER_LINES.length) % FOOTER_LINES.length;
-    footerEl.textContent = FOOTER_LINES[i];
+  var footerIndex = 0;
+  var footerLastBucket = null;
+
+  function setFooterIndex(i) {
+    footerIndex = ((i % FOOTER_LINES.length) + FOOTER_LINES.length) % FOOTER_LINES.length;
+    document.getElementById("footer-text").textContent = FOOTER_LINES[footerIndex];
   }
 
-  updateFooter();
+  function bucketFooterIndex() {
+    var bucket = Math.floor(Date.now() / 300000);
+    return bucket % FOOTER_LINES.length;
+  }
+
+  function updateFooter() {
+    var bucket = Math.floor(Date.now() / 300000);
+    if (bucket !== footerLastBucket) {
+      footerLastBucket = bucket;
+      setFooterIndex(bucketFooterIndex());
+    }
+  }
+
+  footerLastBucket = Math.floor(Date.now() / 300000);
+  setFooterIndex(bucketFooterIndex());
   setInterval(updateFooter, 5000);
+
+  document.getElementById("footer-next").addEventListener("click", function () {
+    setFooterIndex(footerIndex + 1);
+  });
 
   var WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
