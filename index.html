@@ -462,12 +462,12 @@
   fillList("tips-mind", pick(MIND_SETS));
   fillList("tips-digital", pick(DIGITAL_SETS));
 
-  var WEEKDAYS = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+  var WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
   function renderDate() {
     var now = new Date();
     var dateEl = document.getElementById("date");
-    dateEl.textContent = (now.getMonth() + 1) + "월 " + now.getDate() + "일 " + WEEKDAYS[now.getDay()];
+    dateEl.textContent = (now.getMonth() + 1) + "월 " + now.getDate() + "일 (" + WEEKDAYS[now.getDay()] + ")";
   }
 
   function toSeconds(hhmm) {
