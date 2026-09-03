@@ -378,7 +378,7 @@
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M3 11h18a9 7.5 0 0 1-18 0z"/><path d="M12 3v3.2M8.3 4.2v2M15.7 4.2v2"/></svg>
           </span>
-          <h2>오늘 급식 🍚</h2>
+          <h2 id="meal-title">오늘 급식 🍚</h2>
         </div>
         <ul class="tips meal-list" id="tips-meal">
           <li>불러오는 중…</li>
@@ -526,15 +526,29 @@
     return s.replace(/\([0-9.,\s]+\)\s*$/, "").trim();
   }
 
-  function todayYmd() {
+  function mealTargetDate() {
     var now = new Date();
-    return "" + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate());
+    if (now.getHours() >= 13) {
+      now.setDate(now.getDate() + 1);
+    }
+    return now;
+  }
+
+  function ymd(d) {
+    return "" + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate());
   }
 
   function loadMeal() {
     var listEl = document.getElementById("tips-meal");
+    var titleEl = document.getElementById("meal-title");
+    var targetDate = mealTargetDate();
+    var isTomorrow = targetDate.getDate() !== new Date().getDate() || targetDate.getMonth() !== new Date().getMonth();
+    var dayLabel = isTomorrow ? "내일" : "오늘";
+
+    titleEl.textContent = dayLabel + " 급식 🍚";
+
     var url = "https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json"
-      + "&ATPT_OFCDC_SC_CODE=F10&SD_SCHUL_CODE=7140375&MLSV_YMD=" + todayYmd();
+      + "&ATPT_OFCDC_SC_CODE=F10&SD_SCHUL_CODE=7140375&MLSV_YMD=" + ymd(targetDate);
 
     fetch(url)
       .then(function (res) { return res.json(); })
@@ -542,7 +556,7 @@
         var body = data.mealServiceDietInfo && data.mealServiceDietInfo[1];
         var rows = body && body.row;
         if (!rows || !rows.length) {
-          listEl.innerHTML = "<li>오늘은 급식이 없어요 🙂</li>";
+          listEl.innerHTML = "<li>" + dayLabel + "은 급식이 없어요 🙂</li>";
           return;
         }
         var lunch = rows.filter(function (r) { return r.MMEAL_SC_CODE === "2"; })[0] || rows[0];
