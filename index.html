@@ -892,6 +892,13 @@
 
     var current = schedule.find(function (p) { return nowSec >= p.start && nowSec < p.end; });
 
+    var previewParam = new URLSearchParams(window.location.search).get("preview");
+    if (previewParam === "break") {
+      current = { start: nowSec - 1, end: nowSec + 300, type: "break" };
+    } else if (previewParam === "study") {
+      current = { start: nowSec - 1, end: nowSec + 300, type: "study" };
+    }
+
     phaseEl.classList.remove("study", "break");
 
     var isBreak = !!(current && current.type === "break");
