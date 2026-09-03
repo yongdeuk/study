@@ -16,7 +16,7 @@
     --line-study: #57628a;
     --line-health: #5c7f63;
     --line-mind: #a97c42;
-    --line-digital: #9c5f52;
+    --line-meal: #9c5f52;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -32,7 +32,7 @@
       --line-study: #8993bd;
       --line-health: #86a98c;
       --line-mind: #c79c62;
-      --line-digital: #bd8579;
+      --line-meal: #bd8579;
     }
   }
 
@@ -48,7 +48,7 @@
     --line-study: #8993bd;
     --line-health: #86a98c;
     --line-mind: #c79c62;
-    --line-digital: #bd8579;
+    --line-meal: #bd8579;
   }
 
   * { box-sizing: border-box; }
@@ -165,7 +165,7 @@
   .card.study   { --line: var(--line-study); }
   .card.health  { --line: var(--line-health); }
   .card.mind    { --line: var(--line-mind); }
-  .card.digital { --line: var(--line-digital); }
+  .card.meal    { --line: var(--line-meal); }
 
   .card-head {
     display: flex;
@@ -212,11 +212,18 @@
 
   .tips li {
     display: flex;
-    gap: 0.7vw;
+    gap: 1.6vw;
     align-items: flex-start;
     font-size: 3.1rem;
     line-height: 1.42;
     color: var(--ink);
+  }
+
+  .tips.meal-list li {
+    font-size: 2.5rem;
+  }
+  .tips.meal-list {
+    gap: 1.1rem;
   }
 
   .tips li::before {
@@ -297,17 +304,15 @@
         </ul>
       </section>
 
-      <section class="card digital">
+      <section class="card meal">
         <div class="card-head">
           <span class="icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M4 4l16 16"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M3 11h18a9 7.5 0 0 1-18 0z"/><path d="M12 3v3.2M8.3 4.2v2M15.7 4.2v2"/></svg>
           </span>
-          <h2>디지털 습관 📵</h2>
+          <h2>오늘 급식 🍚</h2>
         </div>
-        <ul class="tips" id="tips-digital">
-          <li>휴대폰은 가방 속, 무음 모드 ✈️ (비행기 모드도 환영)</li>
-          <li>확인은 쉬는 시간에 몰아서 딱 한 번만</li>
-          <li>검색이 필요하면 손 들기 — 폰은 죄가 없지만 지금은 안 됨</li>
+        <ul class="tips meal-list" id="tips-meal">
+          <li>불러오는 중…</li>
         </ul>
       </section>
     </main>
@@ -414,34 +419,6 @@
     ]
   ];
 
-  var DIGITAL_SETS = [
-    [
-      "휴대폰은 가방 속, 무음 모드 ✈️ (비행기 모드도 환영)",
-      "확인은 쉬는 시간에 몰아서 딱 한 번만",
-      "검색이 필요하면 손 들기 — 폰은 죄가 없지만 지금은 안 됨"
-    ],
-    [
-      "알림 소리 대신 \"무음 + 진동 끄기\"로 완전 차단",
-      "SNS는 쉬는 시간 10분, 타이머 맞춰두고",
-      "폰이 보이면 자꾸 생각난다 — 아예 서랍 속으로"
-    ],
-    [
-      "급한 연락은 쉬는 시간에 확인, 수업 중엔 대기",
-      "유튜브 \"잠깐만\"이 제일 위험한 함정",
-      "공부할 땐 손 닿지 않는 곳에 두기"
-    ],
-    [
-      "스마트워치 알림도 끄기 — 손목도 예외 아님",
-      "딴생각 들면 폰 대신 물 마시러 가기",
-      "디지털 기기는 필요할 때만, 딱 그만큼만"
-    ],
-    [
-      "확인 습관은 \"정해진 시간\"에만, 충동적으로 하지 않기",
-      "폰 없이 10분 버티기부터 연습",
-      "집중 앱보다 확실한 건 눈에 안 보이게 두는 것"
-    ]
-  ];
-
   function fillList(id, items) {
     var ul = document.getElementById(id);
     ul.innerHTML = items.map(function (t) { return "<li>" + t + "</li>"; }).join("");
@@ -460,7 +437,42 @@
   fillList("tips-study", pick(STUDY_SETS));
   fillList("tips-health", pick(HEALTH_SETS));
   fillList("tips-mind", pick(MIND_SETS));
-  fillList("tips-digital", pick(DIGITAL_SETS));
+
+  function stripAllergyCodes(s) {
+    return s.replace(/\([0-9.,\s]+\)\s*$/, "").trim();
+  }
+
+  function todayYmd() {
+    var now = new Date();
+    return "" + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate());
+  }
+
+  function loadMeal() {
+    var listEl = document.getElementById("tips-meal");
+    var url = "https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json"
+      + "&ATPT_OFCDC_SC_CODE=F10&SD_SCHUL_CODE=7140375&MLSV_YMD=" + todayYmd();
+
+    fetch(url)
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        var body = data.mealServiceDietInfo && data.mealServiceDietInfo[1];
+        var rows = body && body.row;
+        if (!rows || !rows.length) {
+          listEl.innerHTML = "<li>오늘은 급식이 없어요 🙂</li>";
+          return;
+        }
+        var lunch = rows.filter(function (r) { return r.MMEAL_SC_CODE === "2"; })[0] || rows[0];
+        var dishes = lunch.DDISH_NM.split("<br/>")
+          .map(stripAllergyCodes)
+          .filter(function (d) { return d.length > 0; });
+        listEl.innerHTML = dishes.map(function (d) { return "<li>" + d + "</li>"; }).join("");
+      })
+      .catch(function () {
+        listEl.innerHTML = "<li>급식 정보를 불러오지 못했어요</li>";
+      });
+  }
+
+  loadMeal();
 
   var WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
