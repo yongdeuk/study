@@ -114,6 +114,18 @@
     text-align: right;
   }
 
+  .clock-row {
+    display: flex;
+    align-items: baseline;
+    gap: 1.2vw;
+  }
+
+  .date {
+    font-size: 2.6rem;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
   .clock {
     font-variant-numeric: tabular-nums;
     font-size: 7rem;
@@ -234,7 +246,10 @@
         <h1>지금은, 몰입의 시간 🔥</h1>
       </div>
       <div class="status">
-        <span class="clock" id="clock">--:--</span>
+        <div class="clock-row">
+          <span class="date" id="date">-</span>
+          <span class="clock" id="clock">--:--</span>
+        </div>
         <span class="phase" id="phase">시간 확인 중</span>
       </div>
     </header>
@@ -247,7 +262,7 @@
           </span>
           <h2>공부 전략 ✍️</h2>
         </div>
-        <ul class="tips">
+        <ul class="tips" id="tips-study">
           <li>25분 집중 + 5분 휴식, 뽀모도로 🍅 (이름값 하는 타이머)</li>
           <li>어려운 과목은 집중력 좋은 처음 40분에 먼저 배치하기</li>
           <li>틀린 문제는 오답노트에 "왜 틀렸는지" 한 줄로 적기</li>
@@ -261,7 +276,7 @@
           </span>
           <h2>건강 관리 🧘</h2>
         </div>
-        <ul class="tips">
+        <ul class="tips" id="tips-health">
           <li>50분마다 일어나 20초 스트레칭 🐈 (고양이 자세 추천)</li>
           <li>눈과 책·화면 사이 30cm, 코 박고 읽지 않기</li>
           <li>물은 원샷 말고 한 모금씩 자주</li>
@@ -275,7 +290,7 @@
           </span>
           <h2>마인드셋 💭</h2>
         </div>
-        <ul class="tips">
+        <ul class="tips" id="tips-mind">
           <li>"성공은 매일 반복한 작은 노력들의 합이다" — 로버트 콜리어</li>
           <li>"천재는 1%의 영감과 99%의 노력이다" — 토마스 에디슨</li>
           <li>"오늘 걷지 않으면 내일은 뛰어야 한다" — 한국 속담 ✨</li>
@@ -289,7 +304,7 @@
           </span>
           <h2>디지털 습관 📵</h2>
         </div>
-        <ul class="tips">
+        <ul class="tips" id="tips-digital">
           <li>휴대폰은 가방 속, 무음 모드 ✈️ (비행기 모드도 환영)</li>
           <li>확인은 쉬는 시간에 몰아서 딱 한 번만</li>
           <li>검색이 필요하면 손 들기 — 폰은 죄가 없지만 지금은 안 됨</li>
@@ -314,6 +329,146 @@
   fitScreen();
   window.addEventListener("resize", fitScreen);
   window.addEventListener("orientationchange", fitScreen);
+
+  var STUDY_SETS = [
+    [
+      "25분 집중 + 5분 휴식, 뽀모도로 🍅 (이름값 하는 타이머)",
+      "어려운 과목은 집중력 좋은 처음 40분에 먼저 배치하기",
+      "틀린 문제는 오답노트에 \"왜 틀렸는지\" 한 줄로 적기"
+    ],
+    [
+      "목표는 시간이 아니라 분량으로 정하기 (\"2시간\" 대신 \"10문제\")",
+      "인강은 1.2~1.5배속으로, 필기는 손으로 직접",
+      "암기는 자기 전 5분 복습이 효과 두 배"
+    ],
+    [
+      "공부 시작 전, 오늘 할 일 3가지만 종이에 적기",
+      "이해 안 되는 개념은 소리 내어 설명해보기 (셀프 과외)",
+      "쉬운 문제부터 풀어서 리듬 만들기"
+    ],
+    [
+      "국·영·수는 매일 조금씩, 몰아서 하지 않기",
+      "필기는 요약보다 \"내 언어로 다시 쓰기\"",
+      "시험 전날보다 일주일 전 복습이 기억에 오래 남는다"
+    ],
+    [
+      "집중 안 될 땐 과목을 바꿔서 환기하기",
+      "오늘 배운 내용, 백지에 3줄로 요약해보기",
+      "목표 점수보다 목표 \"습관\"을 먼저 세우기"
+    ]
+  ];
+
+  var HEALTH_SETS = [
+    [
+      "50분마다 일어나 20초 스트레칭 🐈 (고양이 자세 추천)",
+      "눈과 책·화면 사이 30cm, 코 박고 읽지 않기",
+      "물은 원샷 말고 한 모금씩 자주"
+    ],
+    [
+      "목·어깨 뭉쳤을 땐 양손으로 원 그리듯 돌리기",
+      "다리 꼬고 앉지 않기 — 혈액순환에 안 좋아요",
+      "조명은 눈부시지 않게, 너무 어둡지도 않게"
+    ],
+    [
+      "하품 나오면 잠깐 창문 열고 환기하기",
+      "간식은 당 폭탄보다 견과류·바나나",
+      "허리는 등받이에 붙이고 골반은 세우기"
+    ],
+    [
+      "쉬는 시간엔 화면 대신 먼 곳 바라보기 (눈 휴식)",
+      "손목·손가락도 가끔 풀어주기",
+      "졸릴 땐 억지로 버티지 말고 세수 한 번"
+    ],
+    [
+      "자세가 무너지면 집중력도 같이 무너진다",
+      "카페인보다 물 — 각성 효과는 비슷, 부작용은 덜함",
+      "점심 먹고 바로 앉지 말고 5분만 걷기"
+    ]
+  ];
+
+  var MIND_SETS = [
+    [
+      "\"성공은 매일 반복한 작은 노력들의 합이다\" — 로버트 콜리어",
+      "\"천재는 1%의 영감과 99%의 노력이다\" — 토마스 에디슨",
+      "\"오늘 걷지 않으면 내일은 뛰어야 한다\" — 한국 속담 ✨"
+    ],
+    [
+      "\"배움에는 왕도가 없다\" — 유클리드",
+      "\"위대한 일은 충동이 아니라 작은 일들이 모여 이루어진다\" — 빈센트 반 고흐",
+      "\"할 수 있다고 믿든 없다고 믿든, 믿는 대로 된다\" — 헨리 포드"
+    ],
+    [
+      "\"인내는 쓰지만 그 열매는 달다\" — 장 자크 루소",
+      "\"실패는 성공으로 가는 과정일 뿐이다\" — 토마스 에디슨",
+      "\"지금 흘리는 땀이 훗날 자랑이 된다\" — 격언"
+    ],
+    [
+      "\"오늘의 노력은 배신하지 않는다\" — 격언",
+      "\"습관이 인격을 만들고, 인격이 운명을 만든다\" — 랠프 왈도 에머슨",
+      "\"시작이 반이다\" — 아리스토텔레스"
+    ],
+    [
+      "\"천 리 길도 한 걸음부터\" — 한국 속담",
+      "\"노력은 결코 배신하지 않는다\" — 격언",
+      "\"가장 큰 실패는 시도하지 않는 것이다\" — 격언"
+    ]
+  ];
+
+  var DIGITAL_SETS = [
+    [
+      "휴대폰은 가방 속, 무음 모드 ✈️ (비행기 모드도 환영)",
+      "확인은 쉬는 시간에 몰아서 딱 한 번만",
+      "검색이 필요하면 손 들기 — 폰은 죄가 없지만 지금은 안 됨"
+    ],
+    [
+      "알림 소리 대신 \"무음 + 진동 끄기\"로 완전 차단",
+      "SNS는 쉬는 시간 10분, 타이머 맞춰두고",
+      "폰이 보이면 자꾸 생각난다 — 아예 서랍 속으로"
+    ],
+    [
+      "급한 연락은 쉬는 시간에 확인, 수업 중엔 대기",
+      "유튜브 \"잠깐만\"이 제일 위험한 함정",
+      "공부할 땐 손 닿지 않는 곳에 두기"
+    ],
+    [
+      "스마트워치 알림도 끄기 — 손목도 예외 아님",
+      "딴생각 들면 폰 대신 물 마시러 가기",
+      "디지털 기기는 필요할 때만, 딱 그만큼만"
+    ],
+    [
+      "확인 습관은 \"정해진 시간\"에만, 충동적으로 하지 않기",
+      "폰 없이 10분 버티기부터 연습",
+      "집중 앱보다 확실한 건 눈에 안 보이게 두는 것"
+    ]
+  ];
+
+  function fillList(id, items) {
+    var ul = document.getElementById(id);
+    ul.innerHTML = items.map(function (t) { return "<li>" + t + "</li>"; }).join("");
+  }
+
+  function dayIndex() {
+    var now = new Date();
+    return Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+  }
+
+  function pick(sets) {
+    var i = ((dayIndex() % sets.length) + sets.length) % sets.length;
+    return sets[i];
+  }
+
+  fillList("tips-study", pick(STUDY_SETS));
+  fillList("tips-health", pick(HEALTH_SETS));
+  fillList("tips-mind", pick(MIND_SETS));
+  fillList("tips-digital", pick(DIGITAL_SETS));
+
+  var WEEKDAYS = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+
+  function renderDate() {
+    var now = new Date();
+    var dateEl = document.getElementById("date");
+    dateEl.textContent = (now.getMonth() + 1) + "월 " + now.getDate() + "일 " + WEEKDAYS[now.getDay()];
+  }
 
   function toSeconds(hhmm) {
     var parts = hhmm.split(":");
@@ -349,6 +504,7 @@
     var phaseEl = document.getElementById("phase");
 
     clockEl.textContent = pad(now.getHours()) + ":" + pad(now.getMinutes());
+    renderDate();
 
     var current = schedule.find(function (p) { return nowSec >= p.start && nowSec < p.end; });
 
