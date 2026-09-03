@@ -295,11 +295,10 @@
     min-width: 0;
   }
 
-  #footer-next {
+  .footer-nav-btn {
     flex: none;
     width: 3.6rem;
     height: 3.6rem;
-    margin-left: 1.6vw;
     border: 1px solid var(--border);
     border-radius: 50%;
     background: var(--surface);
@@ -314,7 +313,15 @@
     padding: 0;
   }
 
-  #footer-next:active {
+  #footer-prev {
+    margin-right: 1.6vw;
+  }
+
+  #footer-next {
+    margin-left: 1.6vw;
+  }
+
+  .footer-nav-btn:active {
     background: var(--bg);
   }
 </style>
@@ -403,8 +410,9 @@
     </div>
 
     <footer id="footer">
+      <button type="button" id="footer-prev" class="footer-nav-btn" aria-label="이전 문구">←</button>
       <span id="footer-text">조용한 집중은 서로에 대한 가장 큰 배려입니다 — 옆 사람 다리 떨기는 열정으로 쳐드릴게요 😉</span>
-      <button type="button" id="footer-next" aria-label="다음 문구">→</button>
+      <button type="button" id="footer-next" class="footer-nav-btn" aria-label="다음 문구">→</button>
     </footer>
   </div>
 </div>
@@ -906,6 +914,10 @@
 
   document.getElementById("footer-next").addEventListener("click", function () {
     setFooterIndex(footerIndex + 1);
+  });
+
+  document.getElementById("footer-prev").addEventListener("click", function () {
+    setFooterIndex(footerIndex - 1);
   });
 
   var WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
