@@ -150,6 +150,55 @@
     gap: 2vw;
   }
 
+  .break-panel {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .break-emoji {
+    font-size: 8rem;
+    line-height: 1;
+    margin-bottom: 1.6rem;
+  }
+
+  .break-title {
+    font-family: "Gowun Dodum", "Noto Sans KR", sans-serif;
+    font-weight: 400;
+    font-size: 7rem;
+    line-height: 1.2;
+    margin: 0 0 1.6rem;
+    color: var(--ink);
+  }
+
+  .break-sub {
+    font-variant-numeric: tabular-nums;
+    font-size: 3.4rem;
+    color: var(--line-mind);
+    margin: 0 0 3.4rem;
+  }
+
+  .break-tips {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+  }
+
+  .break-tip {
+    font-size: 2.6rem;
+    color: var(--ink-soft);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 1.1rem 2.4vw;
+    margin: 0 1vw 1vw 0;
+    white-space: nowrap;
+  }
+
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -257,7 +306,7 @@
       </div>
     </header>
 
-    <main>
+    <main id="mainCards">
       <section class="card study">
         <div class="card-head">
           <span class="icon" aria-hidden="true">
@@ -312,6 +361,18 @@
         </ul>
       </section>
     </main>
+
+    <div class="break-panel" id="breakPanel" style="display: none;">
+      <span class="break-emoji" aria-hidden="true">🌿</span>
+      <h2 class="break-title">잠깐 쉬어가요</h2>
+      <p class="break-sub">다음 시간까지 <span id="breakCountdown">--:--</span> 남았어요</p>
+      <div class="break-tips">
+        <span class="break-tip">💧 물 한 모금</span>
+        <span class="break-tip">🤸 가볍게 스트레칭</span>
+        <span class="break-tip">🚻 화장실 다녀오기</span>
+        <span class="break-tip">👀 먼 곳 바라보기</span>
+      </div>
+    </div>
 
     <footer id="footer">조용한 집중은 서로에 대한 가장 큰 배려입니다 — 옆 사람 다리 떨기는 열정으로 쳐드릴게요 😉</footer>
   </div>
@@ -823,6 +884,8 @@
 
     var clockEl = document.getElementById("clock");
     var phaseEl = document.getElementById("phase");
+    var mainCardsEl = document.getElementById("mainCards");
+    var breakPanelEl = document.getElementById("breakPanel");
 
     clockEl.textContent = pad(now.getHours()) + ":" + pad(now.getMinutes());
     renderDate();
@@ -830,6 +893,10 @@
     var current = schedule.find(function (p) { return nowSec >= p.start && nowSec < p.end; });
 
     phaseEl.classList.remove("study", "break");
+
+    var isBreak = !!(current && current.type === "break");
+    mainCardsEl.style.display = isBreak ? "none" : "grid";
+    breakPanelEl.style.display = isBreak ? "flex" : "none";
 
     if (!current) {
       phaseEl.textContent = "자습 시간이 아닙니다";
@@ -840,9 +907,14 @@
     var mm = Math.floor(remaining / 60);
     var ss = remaining % 60;
     var label = current.type === "break" ? "쉬는 시간" : "자습 시간";
+    var countdown = pad(mm) + ":" + pad(ss);
 
     phaseEl.classList.add(current.type);
-    phaseEl.textContent = label + " · 종료까지 " + pad(mm) + ":" + pad(ss);
+    phaseEl.textContent = label + " · 종료까지 " + countdown;
+
+    if (isBreak) {
+      document.getElementById("breakCountdown").textContent = countdown;
+    }
   }
 
   render();
