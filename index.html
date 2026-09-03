@@ -283,12 +283,16 @@
   footer {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     flex: none;
     padding-top: 2rem;
     border-top: 1px solid var(--border);
     color: var(--ink-faint);
     font-size: 3.8rem;
+  }
+
+  #footer-text {
+    flex: 1 1 0;
+    min-width: 0;
   }
 
   #footer-next {
@@ -884,19 +888,19 @@
   }
 
   function bucketFooterIndex() {
-    var bucket = Math.floor(Date.now() / 300000);
+    var bucket = Math.floor(Date.now() / 180000);
     return bucket % FOOTER_LINES.length;
   }
 
   function updateFooter() {
-    var bucket = Math.floor(Date.now() / 300000);
+    var bucket = Math.floor(Date.now() / 180000);
     if (bucket !== footerLastBucket) {
       footerLastBucket = bucket;
       setFooterIndex(bucketFooterIndex());
     }
   }
 
-  footerLastBucket = Math.floor(Date.now() / 300000);
+  footerLastBucket = Math.floor(Date.now() / 180000);
   setFooterIndex(bucketFooterIndex());
   setInterval(updateFooter, 5000);
 
