@@ -100,8 +100,10 @@
     font-size: 9.8rem;
     line-height: 1.2;
     margin: 0;
-    text-wrap: balance;
     color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .status {
@@ -119,7 +121,7 @@
   }
 
   .date {
-    font-size: 4.8rem;
+    font-size: 7rem;
     color: var(--ink-soft);
     white-space: nowrap;
     margin-right: 1.2vw;
@@ -991,11 +993,11 @@
     var remaining = current.end - nowSec;
     var mm = Math.floor(remaining / 60);
     var ss = remaining % 60;
-    var label = current.type === "break" ? "쉬는 시간" : "자습 시간";
+    var label = current.type === "break" ? "꿀휴식" : "몰입 중";
     var countdown = pad(mm) + ":" + pad(ss);
 
     phaseEl.classList.add(current.type);
-    phaseEl.textContent = label + " · 종료까지 " + countdown;
+    phaseEl.textContent = label + " · " + countdown;
 
     if (isBreak) {
       document.getElementById("breakCountdown").textContent = countdown;
