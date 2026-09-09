@@ -1,4 +1,4 @@
-<title>몰입 보드</title>
+<title>집중 보드</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -339,7 +339,7 @@
   <div class="page">
     <header>
       <div class="title-block">
-        <h1 id="mainTitle">지금은, 몰입의 시간 🔥</h1>
+        <h1 id="mainTitle">지금은, 집중의 시간 🔥</h1>
       </div>
       <div class="status">
         <div class="clock-row">
@@ -764,7 +764,7 @@
     "오답 이유를 한 줄로 적는 습관, 최고의 투자입니다",
     "어려운 단원 넘기지 않고 붙잡는 근성, 인정합니다",
     "공부 계획표 짜는 시간도 이미 공부의 일부입니다",
-    "오늘의 몰입이 내일의 자신감이 됩니다",
+    "오늘의 집중이 내일의 자신감이 됩니다",
     "포기하고 싶은 순간, 그게 성장의 신호입니다",
     "작은 습관이 큰 결과를 만듭니다, 오늘도 계속하세요",
     "지금 이 순간의 집중, 절대 사라지지 않습니다",
@@ -802,7 +802,7 @@
     "축제 준비 소리 들려도 오늘은 자습에 집중해봐요",
     "방학이 코앞이라 더 힘내지는 마법, 다들 압니다",
     "새 학기 다짐, 아직 유효합니다",
-    "자율학습 시작종, 오늘의 몰입 스위치입니다",
+    "자율학습 시작종, 오늘의 집중 스위치입니다",
     "종례 시간 기다리는 마음, 이해합니다",
     "소곤소곤 속삭임도 옆자리엔 크게 들립니다, 살짝만요",
     "질문은 손 들고, 우당탕 뛰어가지 않기로 해요",
@@ -990,7 +990,7 @@
     var isBreak = !!(current && current.type === "break");
     mainCardsEl.style.display = isBreak ? "none" : "grid";
     breakPanelEl.style.display = isBreak ? "flex" : "none";
-    mainTitleEl.textContent = isBreak ? "지금은, 잠깐 쉬어가는 시간 🌿" : "지금은, 몰입의 시간 🔥";
+    mainTitleEl.textContent = isBreak ? "지금은, 잠깐 쉬어가는 시간 🌿" : "지금은, 집중의 시간 🔥";
 
     if (!current) {
       document.getElementById("phase-label").textContent = "자습 시간이 아닙니다";
@@ -1001,7 +1001,7 @@
     var remaining = current.end - nowSec;
     var mm = Math.floor(remaining / 60);
     var ss = remaining % 60;
-    var label = current.type === "break" ? "꿀휴식" : "몰입 중";
+    var label = current.type === "break" ? "꿀휴식" : "집중 중";
     var countdown = pad(mm) + ":" + pad(ss);
 
     phaseEl.classList.add(current.type);
