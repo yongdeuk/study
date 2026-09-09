@@ -543,6 +543,11 @@
   fillList("tips-health", pick(HEALTH_SETS));
   fillList("tips-mind", pick(MIND_SETS));
 
+  var STUDY_LABELS = ["집중 중", "열공 중", "몰두 중", "전력 질주", "두뇌 풀가동"];
+  var BREAK_LABELS = ["꿀휴식", "충전 중", "방전 모드", "여유 만끽", "꿀맛 휴식"];
+  var studyLabel = pick(STUDY_LABELS);
+  var breakLabel = pick(BREAK_LABELS);
+
   function stripAllergyCodes(s) {
     return s.replace(/\([0-9.,\s]+\)\s*$/, "").trim();
   }
@@ -1001,7 +1006,7 @@
     var remaining = current.end - nowSec;
     var mm = Math.floor(remaining / 60);
     var ss = remaining % 60;
-    var label = current.type === "break" ? "꿀휴식" : "집중 중";
+    var label = current.type === "break" ? breakLabel : studyLabel;
     var countdown = pad(mm) + ":" + pad(ss);
 
     phaseEl.classList.add(current.type);
