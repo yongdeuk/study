@@ -997,7 +997,7 @@
     var countdown = pad(mm) + ":" + pad(ss);
 
     phaseEl.classList.add(current.type);
-    phaseEl.textContent = label + " · " + countdown;
+    phaseEl.textContent = label + " " + countdown;
 
     if (isBreak) {
       document.getElementById("breakCountdown").textContent = countdown;
