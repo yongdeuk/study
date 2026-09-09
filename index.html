@@ -136,13 +136,20 @@
 
   .phase {
     font-variant-numeric: tabular-nums;
-    font-size: 6rem;
     color: var(--ink-faint);
     white-space: nowrap;
   }
 
   .phase.study { color: var(--line-study); }
   .phase.break { color: var(--line-mind); }
+
+  #phase-label {
+    font-size: 6rem;
+  }
+
+  #phase-time {
+    font-size: 7rem;
+  }
 
   main {
     flex: 1;
@@ -339,7 +346,7 @@
           <span class="date" id="date">-</span>
           <span class="clock" id="clock">--:--</span>
         </div>
-        <span class="phase" id="phase">시간 확인 중</span>
+        <span class="phase" id="phase"><span id="phase-label">시간 확인 중</span><span id="phase-time"></span></span>
       </div>
     </header>
 
@@ -986,7 +993,8 @@
     mainTitleEl.textContent = isBreak ? "지금은, 잠깐 쉬어가는 시간 🌿" : "지금은, 몰입의 시간 🔥";
 
     if (!current) {
-      phaseEl.textContent = "자습 시간이 아닙니다";
+      document.getElementById("phase-label").textContent = "자습 시간이 아닙니다";
+      document.getElementById("phase-time").textContent = "";
       return;
     }
 
@@ -997,7 +1005,8 @@
     var countdown = pad(mm) + ":" + pad(ss);
 
     phaseEl.classList.add(current.type);
-    phaseEl.textContent = label + " " + countdown;
+    document.getElementById("phase-label").textContent = label + " ";
+    document.getElementById("phase-time").textContent = countdown;
 
     if (isBreak) {
       document.getElementById("breakCountdown").textContent = countdown;
