@@ -134,7 +134,7 @@
 
   .phase {
     font-variant-numeric: tabular-nums;
-    font-size: 4.4rem;
+    font-size: 7rem;
     color: var(--ink-faint);
     white-space: nowrap;
   }
@@ -330,7 +330,7 @@
   <div class="page">
     <header>
       <div class="title-block">
-        <h1>지금은, 몰입의 시간 🔥</h1>
+        <h1 id="mainTitle">지금은, 몰입의 시간 🔥</h1>
       </div>
       <div class="status">
         <div class="clock-row">
@@ -962,6 +962,7 @@
     var phaseEl = document.getElementById("phase");
     var mainCardsEl = document.getElementById("mainCards");
     var breakPanelEl = document.getElementById("breakPanel");
+    var mainTitleEl = document.getElementById("mainTitle");
 
     clockEl.textContent = pad(now.getHours()) + ":" + pad(now.getMinutes());
     renderDate();
@@ -980,6 +981,7 @@
     var isBreak = !!(current && current.type === "break");
     mainCardsEl.style.display = isBreak ? "none" : "grid";
     breakPanelEl.style.display = isBreak ? "flex" : "none";
+    mainTitleEl.textContent = isBreak ? "지금은, 잠깐 쉬어가는 시간 🌿" : "지금은, 몰입의 시간 🔥";
 
     if (!current) {
       phaseEl.textContent = "자습 시간이 아닙니다";
