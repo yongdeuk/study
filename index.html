@@ -342,9 +342,9 @@
 
   .news-src {
     display: block;
-    font-size: 0.64em;
+    font-size: 0.66em;
     color: var(--ink-faint);
-    margin-top: 0.3rem;
+    margin-top: 0.4rem;
   }
 
   .meal-nav {
@@ -744,8 +744,10 @@
   // 수능·입시·진로 소식: Vercel 함수(/api/news)가 모아 준 헤드라인을 보여준다.
   // 불러오지 못하면 기존 마인드셋 명언을 그대로 둔다.
   var NEWS_URL = "https://study-umber-mu.vercel.app/api/news";
+  var newsItems = [];
+  var newsIndex = 0;
+  var newsShown = 0;
   var newsNeedsFit = false;
-  var newsLoaded = false;
 
   function loadNews() {
     fetch(NEWS_URL)
@@ -753,46 +755,54 @@
       .then(function (data) {
         var items = (data && data.items) || [];
         if (!items.length) { return; }
-        var listEl = document.getElementById("tips-mind");
-        listEl.innerHTML = "";
-        items.slice(0, 8).forEach(function (item) {
-          var li = document.createElement("li");
-          var text = document.createElement("span");
-          text.appendChild(document.createTextNode(item.title));
-          if (item.source) {
-            var src = document.createElement("span");
-            src.className = "news-src";
-            src.textContent = item.source;
-            text.appendChild(src);
-          }
-          li.appendChild(text);
-          listEl.appendChild(li);
-        });
+        newsItems = items;
+        newsIndex = 0;
         document.getElementById("mind-title").textContent = "수능·진로 📰";
-        newsLoaded = true;
         newsNeedsFit = true;
         fitNews();
       })
       .catch(function () {});
   }
 
+  function buildNewsItem(item) {
+    var li = document.createElement("li");
+    var text = document.createElement("span");
+    text.appendChild(document.createTextNode(item.title));
+    if (item.source) {
+      var src = document.createElement("span");
+      src.className = "news-src";
+      src.textContent = item.source;
+      text.appendChild(src);
+    }
+    li.appendChild(text);
+    return li;
+  }
+
   function applyNewsSize(listEl, size) {
     var items = listEl.getElementsByTagName("li");
     for (var i = 0; i < items.length; i++) {
       items[i].style.fontSize = size + "rem";
-      items[i].style.marginBottom = (i === items.length - 1 ? 0 : size * 0.5) + "rem";
+      items[i].style.marginBottom = (i === items.length - 1 ? 0 : size * 0.6) + "rem";
     }
   }
 
+  // newsIndex부터 순서대로 채우고, 카드에 넘치면 글자를 조금 줄이다가 그래도 넘치면 뒤쪽 기사를 뺀다.
   function fitNews() {
     var mainEl = document.getElementById("mainCards");
     var listEl = document.getElementById("tips-mind");
-    if (!newsLoaded) { return; }
+    if (!newsItems.length) { return; }
     if (mainEl.style.display === "none") { newsNeedsFit = true; return; }
     newsNeedsFit = false;
-    var size = 2.7;
+
+    listEl.innerHTML = "";
+    var count = Math.min(newsItems.length, 6);
+    for (var i = 0; i < count; i++) {
+      listEl.appendChild(buildNewsItem(newsItems[(newsIndex + i) % newsItems.length]));
+    }
+
+    var size = 2.8;
     applyNewsSize(listEl, size);
-    while (size > 2.0 && listEl.scrollHeight > listEl.clientHeight + 1) {
+    while (size > 2.4 && listEl.scrollHeight > listEl.clientHeight + 1) {
       size -= 0.1;
       applyNewsSize(listEl, size);
     }
@@ -800,10 +810,20 @@
       listEl.removeChild(listEl.lastChild);
       applyNewsSize(listEl, size);
     }
+    newsShown = listEl.getElementsByTagName("li").length;
+  }
+
+  // 1분마다 다음 헤드라인 묶음으로 넘긴다.
+  function nextNewsPage() {
+    var mainEl = document.getElementById("mainCards");
+    if (!newsItems.length || mainEl.style.display === "none") { return; }
+    newsIndex = (newsIndex + Math.max(newsShown, 1)) % newsItems.length;
+    fitNews();
   }
 
   loadNews();
   setInterval(loadNews, 15 * 60 * 1000);
+  setInterval(nextNewsPage, 60 * 1000);
 
   var FOOTER_LINES = [
     "옆 사람 다리 떨기는 열정으로 쳐드릴게요",
