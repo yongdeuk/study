@@ -434,6 +434,7 @@
     var board = document.querySelector(".board");
     board.style.height = h + "px";
     board.style.width = w + "px";
+    mealNeedsFit = true;
   }
 
   fitScreen();
@@ -552,13 +553,16 @@
     return s.replace(/\([0-9.,\s]+\)\s*$/, "").trim();
   }
 
-  function mealTargetDate() {
+  // 13시 전: 오늘 점심(중식), 13시 이후: 오늘 석식. 자정이 지나 날짜가 바뀌면 그날 점심으로 돌아간다.
+  function mealSelection() {
     var now = new Date();
-    if (now.getHours() >= 13) {
-      now.setDate(now.getDate() + 1);
-    }
-    return now;
+    var isDinner = now.getHours() >= 13;
+    return { ymd: ymd(now), code: isDinner ? "3" : "2", name: isDinner ? "석식" : "점심" };
   }
+
+  var mealLoadedFor = null;
+  var mealRequestId = 0;
+  var mealNeedsFit = false;
 
   function ymd(d) {
     return "" + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate());
@@ -567,33 +571,68 @@
   function loadMeal() {
     var listEl = document.getElementById("tips-meal");
     var titleEl = document.getElementById("meal-title");
-    var targetDate = mealTargetDate();
-    var isTomorrow = targetDate.getDate() !== new Date().getDate() || targetDate.getMonth() !== new Date().getMonth();
-    var dayLabel = isTomorrow ? "내일" : "오늘";
+    var sel = mealSelection();
 
-    titleEl.textContent = dayLabel + " 급식 🍚";
+    titleEl.textContent = "오늘 " + sel.name + " 🍚";
+
+    mealLoadedFor = sel.ymd + sel.code;
+    var requestId = ++mealRequestId;
 
     var url = "https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json"
-      + "&ATPT_OFCDC_SC_CODE=F10&SD_SCHUL_CODE=7140375&MLSV_YMD=" + ymd(targetDate);
+      + "&ATPT_OFCDC_SC_CODE=F10&SD_SCHUL_CODE=7140375&MLSV_YMD=" + sel.ymd;
 
     fetch(url)
       .then(function (res) { return res.json(); })
       .then(function (data) {
+        if (requestId !== mealRequestId) { return; }
         var body = data.mealServiceDietInfo && data.mealServiceDietInfo[1];
         var rows = body && body.row;
-        if (!rows || !rows.length) {
-          listEl.innerHTML = "<li>" + dayLabel + "은 급식이 없어요 🙂</li>";
+        var meal = rows && rows.filter(function (r) { return r.MMEAL_SC_CODE === sel.code; })[0];
+        if (!meal) {
+          listEl.innerHTML = "<li>오늘은 " + sel.name + "이 없어요 🙂</li>";
+          mealNeedsFit = true;
           return;
         }
-        var lunch = rows.filter(function (r) { return r.MMEAL_SC_CODE === "2"; })[0] || rows[0];
-        var dishes = lunch.DDISH_NM.split("<br/>")
+        var dishes = meal.DDISH_NM.split("<br/>")
           .map(stripAllergyCodes)
           .filter(function (d) { return d.length > 0; });
         listEl.innerHTML = dishes.map(function (d) { return "<li>" + d + "</li>"; }).join("");
+        mealNeedsFit = true;
+        fitMeal();
       })
       .catch(function () {
+        if (requestId !== mealRequestId) { return; }
         listEl.innerHTML = "<li>급식 정보를 불러오지 못했어요</li>";
+        setTimeout(function () {
+          if (requestId === mealRequestId) { mealLoadedFor = null; }
+        }, 60000);
       });
+  }
+
+  function applyMealSize(listEl, size) {
+    var items = listEl.getElementsByTagName("li");
+    for (var i = 0; i < items.length; i++) {
+      items[i].style.fontSize = size + "rem";
+      items[i].style.marginBottom = (i === items.length - 1 ? 0 : size * 0.61) + "rem";
+    }
+  }
+
+  function fitMeal() {
+    var mainEl = document.getElementById("mainCards");
+    var listEl = document.getElementById("tips-meal");
+    if (mainEl.style.display === "none") { mealNeedsFit = true; return; }
+    mealNeedsFit = false;
+    var size = 3.1;
+    applyMealSize(listEl, size);
+    while (size > 1.7 && listEl.scrollHeight > listEl.clientHeight + 1) {
+      size -= 0.1;
+      applyMealSize(listEl, size);
+    }
+  }
+
+  function checkMealDay() {
+    var sel = mealSelection();
+    if (mealLoadedFor !== sel.ymd + sel.code) { loadMeal(); }
   }
 
   loadMeal();
@@ -996,6 +1035,9 @@
     mainCardsEl.style.display = isBreak ? "none" : "grid";
     breakPanelEl.style.display = isBreak ? "flex" : "none";
     mainTitleEl.textContent = isBreak ? "지금은, 잠깐 쉬어가는 시간 🌿" : "지금은, 집중의 시간 🔥";
+
+    checkMealDay();
+    if (!isBreak && mealNeedsFit) { fitMeal(); }
 
     if (!current) {
       document.getElementById("phase-label").textContent = "자습 시간이 아닙니다";
