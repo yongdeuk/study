@@ -7,23 +7,23 @@
 
 <style>
   :root {
-    --frame: #e3ebea;
-    --bg: #edf2f1;
-    --surface: #f8fbfa;
-    --ink: #2e3a45;
-    --ink-soft: #5c6b78;
-    --ink-faint: #8795a0;
-    --border: #d3dedf;
+    --frame: #e7e2d4;
+    --bg: #f5f1e8;
+    --surface: #faf7f0;
+    --ink: #2b2e33;
+    --ink-soft: #656a6f;
+    --ink-faint: #93979c;
+    --border: #ddd7c7;
 
-    --line-study: #4f6b9a;
-    --line-health: #4f8a6c;
-    --line-mind: #b0814c;
-    --line-meal: #b0665a;
+    --line-study: #57628a;
+    --line-health: #5c7f63;
+    --line-mind: #a97c42;
+    --line-meal: #9c5f52;
 
-    --tint-study: #e7eef8;
-    --tint-health: #e5f1ea;
-    --tint-mind: #f7efe0;
-    --tint-meal: #f6e9e5;
+    --tint-study: #faf7f0;
+    --tint-health: #faf7f0;
+    --tint-mind: #faf7f0;
+    --tint-meal: #faf7f0;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -108,14 +108,14 @@
 
   .hero {
     flex: none;
-    max-width: 62vw;
+    width: 38vw;
     min-width: 0;
   }
 
   h1 {
     font-family: "Gowun Dodum", "Noto Sans KR", sans-serif;
     font-weight: 400;
-    font-size: 3.6rem;
+    font-size: 3.4rem;
     line-height: 1.2;
     margin: 0 0 0.6rem;
     color: var(--ink-soft);
@@ -129,7 +129,7 @@
     flex-direction: column;
     align-items: center;
     flex: none;
-    margin-left: 5vw;
+    margin-right: 2.5vw;
     text-align: center;
     padding: 2rem 3.6vw 2.2rem;
     background: var(--surface);
@@ -153,7 +153,7 @@
     color: var(--ink);
   }
 
-  /* 남은 시간이 화면의 주인공: 가장 크게, 초는 한 단계 옅게 */
+  /* 남은 시간이 화면의 주인공: 분과 초를 같은 크기로 가장 크게 */
   .phase {
     display: flex;
     align-items: baseline;
@@ -164,6 +164,8 @@
 
   .phase.study { color: var(--line-study); }
   .phase.break { color: var(--line-mind); }
+  .phase.study.s1 { color: var(--line-health); }
+  .phase.study.s2 { color: var(--line-meal); }
 
   #phase-label {
     font-size: 4.6rem;
@@ -175,11 +177,6 @@
     font-family: "Gowun Dodum", "Noto Sans KR", sans-serif;
     font-size: 14rem;
     line-height: 1;
-  }
-
-  #phase-sec {
-    font-size: 8.6rem;
-    opacity: 0.5;
   }
 
   .progress-row {
@@ -197,11 +194,22 @@
   #progress-end { margin-left: 1.6rem; }
 
   .progress {
+    position: relative;
     flex: 1 1 auto;
     height: 1.1rem;
     border-radius: 0.55rem;
     background: var(--border);
     overflow: hidden;
+  }
+
+  /* 10분 전, 5분 전 지점을 막대 위에 작은 눈금으로 표시 */
+  .tick {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 0.28rem;
+    background: var(--ink-faint);
+    opacity: 0.55;
   }
 
   .progress-fill {
@@ -214,6 +222,8 @@
 
   .progress.study .progress-fill { background: var(--line-study); }
   .progress.break .progress-fill { background: var(--line-mind); }
+  .progress.study.s1 .progress-fill { background: var(--line-health); }
+  .progress.study.s2 .progress-fill { background: var(--line-meal); box-shadow: 0 0 1.4rem var(--line-meal); }
 
   main {
     flex: 1;
@@ -454,6 +464,10 @@
 <div class="board">
   <div class="page">
     <header>
+      <div class="status">
+        <span class="date" id="date">-</span>
+        <span class="clock" id="clock">--:--</span>
+      </div>
       <div class="hero">
         <h1 id="mainTitle">지금은, 집중의 시간 🔥</h1>
         <div class="phase" id="phase">
@@ -462,13 +476,9 @@
         </div>
         <div class="progress-row" id="progress-row">
           <span id="progress-start"></span>
-          <div class="progress" id="progress"><div class="progress-fill" id="progress-fill"></div></div>
+          <div class="progress" id="progress"><div class="progress-fill" id="progress-fill"></div><span class="tick" id="tick1"></span><span class="tick" id="tick2"></span></div>
           <span id="progress-end"></span>
         </div>
-      </div>
-      <div class="status">
-        <span class="date" id="date">-</span>
-        <span class="clock" id="clock">--:--</span>
       </div>
     </header>
 
@@ -1003,7 +1013,7 @@
       current = { start: nowSec - 1, end: nowSec + 300, type: "study" };
     }
 
-    phaseEl.classList.remove("study", "break");
+    phaseEl.classList.remove("study", "break", "s1", "s2");
 
     var isBreak = !!(current && current.type === "break");
     mainCardsEl.style.display = isBreak ? "none" : "grid";
@@ -1027,21 +1037,48 @@
     }
 
     var remaining = current.end - nowSec;
+    var total = current.end - current.start;
     var mm = Math.floor(remaining / 60);
     var ss = remaining % 60;
     var label = current.type === "break" ? breakLabel : studyLabel;
 
+    // 끝이 가까워지면 색과 문구가 조금씩 바뀐다: 자습은 10분·5분·1분 전, 쉬는 시간은 3분·1분 전.
+    var stage = 0;
+    var stageClass = "";
+    var message = "";
+    if (current.type === "study") {
+      if (remaining <= 60) { stage = 3; message = "마지막 1분, 끝까지 힘내요 🌟"; stageClass = "s2"; }
+      else if (remaining <= 300) { stage = 2; message = "마지막 5분, 거의 다 왔어요 ✨"; stageClass = "s2"; }
+      else if (remaining <= 600) { stage = 1; message = "10분 남았어요, 조금만 더 힘내요 💪"; stageClass = "s1"; }
+    } else {
+      if (remaining <= 60) { stage = 2; message = "1분 남았어요, 자리로 돌아와요 🌿"; }
+      else if (remaining <= 180) { stage = 1; message = "곧 시작해요, 자리에 앉아요 🌿"; }
+    }
+    if (message) { mainTitleEl.textContent = message; }
+
     phaseEl.classList.add(current.type);
+    if (stageClass) { phaseEl.classList.add(stageClass); }
     document.getElementById("phase-label").textContent = label;
     document.getElementById("phase-min").textContent = pad(mm);
     document.getElementById("phase-sec").textContent = ":" + pad(ss);
 
-    var elapsed = (nowSec - current.start) / (current.end - current.start) * 100;
+    var elapsed = (nowSec - current.start) / total * 100;
     progressRowEl.style.display = "flex";
-    progressEl.className = "progress " + current.type;
+    progressEl.className = "progress " + current.type + (stageClass ? " " + stageClass : "");
     document.getElementById("progress-start").textContent = clockText(current.start) + " 시작";
     document.getElementById("progress-end").textContent = clockText(current.end) + " 종료";
     document.getElementById("progress-fill").style.width = Math.max(0, Math.min(100, elapsed)) + "%";
+
+    var marks = current.type === "study" ? [600, 300] : [180];
+    ["tick1", "tick2"].forEach(function (id, i) {
+      var tickEl = document.getElementById(id);
+      if (i < marks.length && total > marks[i]) {
+        tickEl.style.display = "block";
+        tickEl.style.left = ((total - marks[i]) / total * 100) + "%";
+      } else {
+        tickEl.style.display = "none";
+      }
+    });
   }
 
   render();
