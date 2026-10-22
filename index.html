@@ -7,18 +7,23 @@
 
 <style>
   :root {
-    --frame: #e7e2d4;
-    --bg: #f5f1e8;
-    --surface: #faf7f0;
-    --ink: #2b2e33;
-    --ink-soft: #656a6f;
-    --ink-faint: #93979c;
-    --border: #ddd7c7;
+    --frame: #e3ebea;
+    --bg: #edf2f1;
+    --surface: #f8fbfa;
+    --ink: #2e3a45;
+    --ink-soft: #5c6b78;
+    --ink-faint: #8795a0;
+    --border: #d3dedf;
 
-    --line-study: #57628a;
-    --line-health: #5c7f63;
-    --line-mind: #a97c42;
-    --line-meal: #9c5f52;
+    --line-study: #4f6b9a;
+    --line-health: #4f8a6c;
+    --line-mind: #b0814c;
+    --line-meal: #b0665a;
+
+    --tint-study: #e7eef8;
+    --tint-health: #e5f1ea;
+    --tint-mind: #f7efe0;
+    --tint-meal: #f6e9e5;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -35,6 +40,11 @@
       --line-health: #86a98c;
       --line-mind: #c79c62;
       --line-meal: #bd8579;
+
+      --tint-study: #1b1d22;
+      --tint-health: #1b1d22;
+      --tint-mind: #1b1d22;
+      --tint-meal: #1b1d22;
     }
   }
 
@@ -51,7 +61,14 @@
     --line-health: #86a98c;
     --line-mind: #c79c62;
     --line-meal: #bd8579;
+
+    --tint-study: #1b1d22;
+    --tint-health: #1b1d22;
+    --tint-mind: #1b1d22;
+    --tint-meal: #1b1d22;
   }
+
+
 
   * { box-sizing: border-box; }
 
@@ -108,23 +125,28 @@
   .status {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: center;
     flex: none;
-    text-align: right;
+    text-align: center;
+    padding: 2rem 3.6vw 2.2rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1.8rem;
+    box-shadow: 0 0.3rem 1.8rem rgba(70, 70, 60, 0.07);
   }
 
   .date {
-    font-size: 3.6rem;
+    font-size: 3.4rem;
     color: var(--ink-soft);
     white-space: nowrap;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.2rem;
   }
 
   .clock {
     font-variant-numeric: tabular-nums;
-    font-size: 6.6rem;
+    font-size: 10.4rem;
     font-weight: 500;
-    line-height: 1.1;
+    line-height: 1.05;
     color: var(--ink);
   }
 
@@ -157,11 +179,24 @@
     opacity: 0.5;
   }
 
-  .progress {
-    width: 40vw;
-    height: 1rem;
+  .progress-row {
+    display: flex;
+    align-items: center;
+    width: 50vw;
     margin-top: 1.4rem;
-    border-radius: 0.5rem;
+    font-size: 2.6rem;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  #progress-start { margin-right: 1.6rem; }
+  #progress-end { margin-left: 1.6rem; }
+
+  .progress {
+    flex: 1 1 auto;
+    height: 1.1rem;
+    border-radius: 0.55rem;
     background: var(--border);
     overflow: hidden;
   }
@@ -235,19 +270,20 @@
 
   .card {
     background: var(--surface);
+    background: var(--tint, var(--surface));
     border: 1px solid var(--border);
     border-radius: 1.8rem;
-    box-shadow: 0 0.3rem 1.8rem rgba(90, 75, 50, 0.07);
+    box-shadow: 0 0.3rem 1.8rem rgba(70, 70, 60, 0.07);
     padding: 2.6rem 1.8vw;
     display: flex;
     flex-direction: column;
     min-height: 0;
   }
 
-  .card.study   { --line: var(--line-study); }
-  .card.health  { --line: var(--line-health); }
-  .card.mind    { --line: var(--line-mind); }
-  .card.meal    { --line: var(--line-meal); }
+  .card.study   { --line: var(--line-study); --tint: var(--tint-study); }
+  .card.health  { --line: var(--line-health); --tint: var(--tint-health); }
+  .card.mind    { --line: var(--line-mind); --tint: var(--tint-mind); }
+  .card.meal    { --line: var(--line-meal); --tint: var(--tint-meal); }
 
   .card-head {
     display: flex;
@@ -421,7 +457,11 @@
           <span id="phase-label">시간 확인 중</span>
           <span id="phase-time"><span id="phase-min"></span><span id="phase-sec"></span></span>
         </div>
-        <div class="progress" id="progress"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="progress-row" id="progress-row">
+          <span id="progress-start"></span>
+          <div class="progress" id="progress"><div class="progress-fill" id="progress-fill"></div></div>
+          <span id="progress-end"></span>
+        </div>
       </div>
       <div class="status">
         <span class="date" id="date">-</span>
@@ -930,6 +970,10 @@
     return { start: toSeconds(row[0]), end: toSeconds(row[1]), type: row[2] };
   });
 
+  function clockText(sec) {
+    return pad(Math.floor(sec / 3600)) + ":" + pad(Math.floor(sec % 3600 / 60));
+  }
+
   function pad(n) {
     return String(n).padStart(2, "0");
   }
@@ -969,12 +1013,13 @@
     if (!isBreak && staticNeedsFit) { fitStatic(); }
 
     var progressEl = document.getElementById("progress");
+    var progressRowEl = document.getElementById("progress-row");
 
     if (!current) {
       document.getElementById("phase-label").textContent = "자습 시간이 아닙니다";
       document.getElementById("phase-min").textContent = "";
       document.getElementById("phase-sec").textContent = "";
-      progressEl.style.display = "none";
+      progressRowEl.style.display = "none";
       return;
     }
 
@@ -989,8 +1034,10 @@
     document.getElementById("phase-sec").textContent = ":" + pad(ss);
 
     var elapsed = (nowSec - current.start) / (current.end - current.start) * 100;
-    progressEl.style.display = "block";
+    progressRowEl.style.display = "flex";
     progressEl.className = "progress " + current.type;
+    document.getElementById("progress-start").textContent = clockText(current.start) + " 시작";
+    document.getElementById("progress-end").textContent = clockText(current.end) + " 종료";
     document.getElementById("progress-fill").style.width = Math.max(0, Math.min(100, elapsed)) + "%";
   }
 
