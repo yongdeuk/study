@@ -333,6 +333,43 @@
   .footer-nav-btn:active {
     background: var(--bg);
   }
+
+  .card.meal .tips {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .meal-nav {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.4rem;
+  }
+
+  #meal-prev,
+  #meal-next {
+    width: 5rem;
+    height: 5rem;
+    font-size: 2.6rem;
+  }
+
+  .meal-dots {
+    display: flex;
+    align-items: center;
+  }
+
+  .meal-dot {
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    background: var(--border);
+    margin: 0 0.5rem;
+  }
+
+  .meal-dot.on {
+    background: var(--line-meal);
+  }
 </style>
 
 <div class="board">
@@ -403,6 +440,11 @@
         <ul class="tips meal-list" id="tips-meal">
           <li>불러오는 중…</li>
         </ul>
+        <div class="meal-nav">
+          <button type="button" id="meal-prev" class="footer-nav-btn" aria-label="이전 급식">←</button>
+          <span class="meal-dots" id="meal-dots" aria-hidden="true"></span>
+          <button type="button" id="meal-next" class="footer-nav-btn" aria-label="다음 급식">→</button>
+        </div>
       </section>
     </main>
 
@@ -553,43 +595,82 @@
     return s.replace(/\([0-9.,\s]+\)\s*$/, "").trim();
   }
 
-  // 13시 전: 오늘 점심(중식), 13시 이후: 오늘 석식. 자정이 지나 날짜가 바뀌면 그날 점심으로 돌아간다.
-  function mealSelection() {
-    var now = new Date();
-    var isDinner = now.getHours() >= 13;
-    return { ymd: ymd(now), code: isDinner ? "3" : "2", name: isDinner ? "석식" : "점심" };
-  }
-
+  // 슬롯: 0 오늘 점심, 1 오늘 석식, 2 내일 점심, 3 내일 석식.
+  // 자동 선택은 13시 전 0번, 이후 1번. 화살표로 넘겨보다가도 자동 슬롯이 바뀌면(13시, 자정) 자동으로 복귀한다.
+  var MEAL_SLOTS = 4;
+  var mealManualSlot = null;
+  var mealAutoKey = null;
   var mealLoadedFor = null;
   var mealRequestId = 0;
   var mealNeedsFit = false;
+  var mealCache = {};
 
   function ymd(d) {
     return "" + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate());
   }
 
+  function autoMealSlot() {
+    return new Date().getHours() >= 13 ? 1 : 0;
+  }
+
+  function mealSelection(slot) {
+    var d = new Date();
+    var dayOffset = slot >= 2 ? 1 : 0;
+    if (dayOffset) { d.setDate(d.getDate() + 1); }
+    var isDinner = slot % 2 === 1;
+    return {
+      slot: slot,
+      ymd: ymd(d),
+      code: isDinner ? "3" : "2",
+      title: (dayOffset ? "내일 " : "오늘 ") + (isDinner ? "석식" : "점심"),
+      name: isDinner ? "석식" : "점심",
+      dayLabel: dayOffset ? "내일" : "오늘"
+    };
+  }
+
+  function currentMealSlot() {
+    return mealManualSlot === null ? autoMealSlot() : mealManualSlot;
+  }
+
+  function renderMealDots(slot) {
+    var html = "";
+    for (var i = 0; i < MEAL_SLOTS; i++) {
+      html += '<span class="meal-dot' + (i === slot ? " on" : "") + '"></span>';
+    }
+    document.getElementById("meal-dots").innerHTML = html;
+  }
+
+  function fetchMealRows(dateKey) {
+    if (mealCache[dateKey]) { return Promise.resolve(mealCache[dateKey]); }
+    var url = "https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json"
+      + "&ATPT_OFCDC_SC_CODE=F10&SD_SCHUL_CODE=7140375&MLSV_YMD=" + dateKey;
+    return fetch(url)
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        var body = data.mealServiceDietInfo && data.mealServiceDietInfo[1];
+        var rows = (body && body.row) || [];
+        mealCache[dateKey] = rows;
+        return rows;
+      });
+  }
+
   function loadMeal() {
     var listEl = document.getElementById("tips-meal");
     var titleEl = document.getElementById("meal-title");
-    var sel = mealSelection();
+    var sel = mealSelection(currentMealSlot());
 
-    titleEl.textContent = "오늘 " + sel.name + " 🍚";
+    titleEl.textContent = sel.title + " 🍚";
+    renderMealDots(sel.slot);
 
     mealLoadedFor = sel.ymd + sel.code;
     var requestId = ++mealRequestId;
 
-    var url = "https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json"
-      + "&ATPT_OFCDC_SC_CODE=F10&SD_SCHUL_CODE=7140375&MLSV_YMD=" + sel.ymd;
-
-    fetch(url)
-      .then(function (res) { return res.json(); })
-      .then(function (data) {
+    fetchMealRows(sel.ymd)
+      .then(function (rows) {
         if (requestId !== mealRequestId) { return; }
-        var body = data.mealServiceDietInfo && data.mealServiceDietInfo[1];
-        var rows = body && body.row;
-        var meal = rows && rows.filter(function (r) { return r.MMEAL_SC_CODE === sel.code; })[0];
+        var meal = rows.filter(function (r) { return r.MMEAL_SC_CODE === sel.code; })[0];
         if (!meal) {
-          listEl.innerHTML = "<li>오늘은 " + sel.name + "이 없어요 🙂</li>";
+          listEl.innerHTML = "<li>" + sel.dayLabel + "은 " + sel.name + "이 없어요 🙂</li>";
           mealNeedsFit = true;
           return;
         }
@@ -631,11 +712,25 @@
   }
 
   function checkMealDay() {
-    var sel = mealSelection();
-    if (mealLoadedFor !== sel.ymd + sel.code) { loadMeal(); }
+    var sel = mealSelection(autoMealSlot());
+    var autoKey = sel.ymd + sel.code;
+    if (autoKey !== mealAutoKey) {
+      mealAutoKey = autoKey;
+      mealManualSlot = null;
+      loadMeal();
+    } else if (mealLoadedFor === null) {
+      loadMeal();
+    }
   }
 
-  loadMeal();
+  function stepMeal(delta) {
+    var next = ((currentMealSlot() + delta) % MEAL_SLOTS + MEAL_SLOTS) % MEAL_SLOTS;
+    mealManualSlot = next;
+    loadMeal();
+  }
+
+  document.getElementById("meal-prev").addEventListener("click", function () { stepMeal(-1); });
+  document.getElementById("meal-next").addEventListener("click", function () { stepMeal(1); });
 
   var FOOTER_LINES = [
     "옆 사람 다리 떨기는 열정으로 쳐드릴게요",
