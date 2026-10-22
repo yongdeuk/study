@@ -86,7 +86,7 @@
     align-items: center;
     justify-content: space-between;
     flex: none;
-    margin-bottom: 3.2rem;
+    margin-bottom: 2rem;
   }
 
   .title-block {
@@ -295,8 +295,9 @@
     display: flex;
     align-items: center;
     flex: none;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border);
+    padding-bottom: 1.6rem;
+    margin-bottom: 1.6rem;
+    border-bottom: 1px solid var(--border);
     color: var(--ink-faint);
     font-size: 3.8rem;
   }
@@ -403,6 +404,12 @@
       </div>
     </header>
 
+    <footer id="footer">
+      <button type="button" id="footer-prev" class="footer-nav-btn" aria-label="이전 문구">←</button>
+      <span id="footer-text">조용한 집중은 서로에 대한 가장 큰 배려입니다 — 옆 사람 다리 떨기는 열정으로 쳐드릴게요 😉</span>
+      <button type="button" id="footer-next" class="footer-nav-btn" aria-label="다음 문구">→</button>
+    </footer>
+
     <main id="mainCards">
       <section class="card study">
         <div class="card-head">
@@ -476,11 +483,6 @@
       </div>
     </div>
 
-    <footer id="footer">
-      <button type="button" id="footer-prev" class="footer-nav-btn" aria-label="이전 문구">←</button>
-      <span id="footer-text">조용한 집중은 서로에 대한 가장 큰 배려입니다 — 옆 사람 다리 떨기는 열정으로 쳐드릴게요 😉</span>
-      <button type="button" id="footer-next" class="footer-nav-btn" aria-label="다음 문구">→</button>
-    </footer>
   </div>
 </div>
 
