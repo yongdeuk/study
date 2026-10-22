@@ -340,6 +340,12 @@
     min-height: 0;
   }
 
+  .news-link {
+    color: inherit;
+    text-decoration: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.08);
+  }
+
   .news-src {
     display: block;
     font-size: 0.66em;
@@ -771,10 +777,21 @@
     if (item.source) {
       var src = document.createElement("span");
       src.className = "news-src";
-      src.textContent = item.source;
+      src.textContent = item.source + (item.link ? " ↗" : "");
       text.appendChild(src);
     }
-    li.appendChild(text);
+    if (item.link && /^https?:\/\//.test(item.link)) {
+      // 누르면 새 창으로 열린다. 외부 페이지가 이 화면을 건드리지 못하도록 noopener를 건다.
+      var a = document.createElement("a");
+      a.className = "news-link";
+      a.href = item.link;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.appendChild(text);
+      li.appendChild(a);
+    } else {
+      li.appendChild(text);
+    }
     return li;
   }
 
