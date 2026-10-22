@@ -101,12 +101,14 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     flex: none;
     margin-bottom: 2rem;
   }
 
   .hero {
+    flex: none;
+    max-width: 62vw;
     min-width: 0;
   }
 
@@ -127,6 +129,7 @@
     flex-direction: column;
     align-items: center;
     flex: none;
+    margin-left: 5vw;
     text-align: center;
     padding: 2rem 3.6vw 2.2rem;
     background: var(--surface);
@@ -182,7 +185,7 @@
   .progress-row {
     display: flex;
     align-items: center;
-    width: 50vw;
+    width: 100%;
     margin-top: 1.4rem;
     font-size: 2.6rem;
     color: var(--ink-faint);
