@@ -334,9 +334,17 @@
     background: var(--bg);
   }
 
-  .card.meal .tips {
+  .card.meal .tips,
+  .card.mind .tips {
     flex: 1 1 auto;
     min-height: 0;
+  }
+
+  .news-src {
+    display: block;
+    font-size: 0.64em;
+    color: var(--ink-faint);
+    margin-top: 0.3rem;
   }
 
   .meal-nav {
@@ -421,7 +429,7 @@
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M12 3v2.2M12 18.8V21M4.2 12H2M22 12h-2.2M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6"/><circle cx="12" cy="12" r="4.6"/></svg>
           </span>
-          <h2>마인드셋 💭</h2>
+          <h2 id="mind-title">마인드셋 💭</h2>
         </div>
         <ul class="tips" id="tips-mind">
           <li>"성공은 매일 반복한 작은 노력들의 합이다" — 로버트 콜리어</li>
@@ -477,6 +485,7 @@
     board.style.height = h + "px";
     board.style.width = w + "px";
     mealNeedsFit = true;
+    newsNeedsFit = true;
   }
 
   fitScreen();
@@ -731,6 +740,70 @@
 
   document.getElementById("meal-prev").addEventListener("click", function () { stepMeal(-1); });
   document.getElementById("meal-next").addEventListener("click", function () { stepMeal(1); });
+
+  // 수능·입시·진로 소식: Vercel 함수(/api/news)가 모아 준 헤드라인을 보여준다.
+  // 불러오지 못하면 기존 마인드셋 명언을 그대로 둔다.
+  var NEWS_URL = "https://study-umber-mu.vercel.app/api/news";
+  var newsNeedsFit = false;
+  var newsLoaded = false;
+
+  function loadNews() {
+    fetch(NEWS_URL)
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        var items = (data && data.items) || [];
+        if (!items.length) { return; }
+        var listEl = document.getElementById("tips-mind");
+        listEl.innerHTML = "";
+        items.slice(0, 8).forEach(function (item) {
+          var li = document.createElement("li");
+          var text = document.createElement("span");
+          text.appendChild(document.createTextNode(item.title));
+          if (item.source) {
+            var src = document.createElement("span");
+            src.className = "news-src";
+            src.textContent = item.source;
+            text.appendChild(src);
+          }
+          li.appendChild(text);
+          listEl.appendChild(li);
+        });
+        document.getElementById("mind-title").textContent = "수능·진로 📰";
+        newsLoaded = true;
+        newsNeedsFit = true;
+        fitNews();
+      })
+      .catch(function () {});
+  }
+
+  function applyNewsSize(listEl, size) {
+    var items = listEl.getElementsByTagName("li");
+    for (var i = 0; i < items.length; i++) {
+      items[i].style.fontSize = size + "rem";
+      items[i].style.marginBottom = (i === items.length - 1 ? 0 : size * 0.5) + "rem";
+    }
+  }
+
+  function fitNews() {
+    var mainEl = document.getElementById("mainCards");
+    var listEl = document.getElementById("tips-mind");
+    if (!newsLoaded) { return; }
+    if (mainEl.style.display === "none") { newsNeedsFit = true; return; }
+    newsNeedsFit = false;
+    var size = 2.7;
+    applyNewsSize(listEl, size);
+    while (size > 2.0 && listEl.scrollHeight > listEl.clientHeight + 1) {
+      size -= 0.1;
+      applyNewsSize(listEl, size);
+    }
+    while (listEl.getElementsByTagName("li").length > 1 && listEl.scrollHeight > listEl.clientHeight + 1) {
+      listEl.removeChild(listEl.lastChild);
+      applyNewsSize(listEl, size);
+    }
+  }
+
+  loadNews();
+  setInterval(loadNews, 15 * 60 * 1000);
 
   var FOOTER_LINES = [
     "옆 사람 다리 떨기는 열정으로 쳐드릴게요",
@@ -1133,6 +1206,7 @@
 
     checkMealDay();
     if (!isBreak && mealNeedsFit) { fitMeal(); }
+    if (!isBreak && newsNeedsFit) { fitNews(); }
 
     if (!current) {
       document.getElementById("phase-label").textContent = "자습 시간이 아닙니다";
